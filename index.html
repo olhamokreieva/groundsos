@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)file:///C:/Users/olham/Downloads/index_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GroundSOS — Emergency Response Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="./index_files/css2" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06080e;--surface:#0c1018;--surface2:#111620;--surface3:#16202e;--surface4:#1c2840;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.13);
+  --text:#e8edf5;--text2:#8a96aa;--text3:#4f5a6e;
+  --red:#e63946;--red-dim:rgba(230,57,70,0.15);
+  --green:#2ecc8a;--green-dim:rgba(46,204,138,0.12);
+  --blue:#3a7bd5;--blue-dim:rgba(58,123,213,0.15);
+  --amber:#f4a429;--amber-dim:rgba(244,164,41,0.12);
+  --fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'IBM Plex Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--fb)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes sentPulse{0%,100%{box-shadow:0 0 0 0 rgba(230,57,70,.4)}60%{box-shadow:0 0 0 22px rgba(230,57,70,0)}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(6,8,14,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:9999}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--fh);font-size:17px;font-weight:800;letter-spacing:-.3px}
+.logo-box{width:26px;height:26px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-box svg{width:14px;height:14px;fill:white}
+.vtoggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
+.vbtn{padding:5px 16px;border-radius:5px;font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .18s}
+.vbtn.active{background:var(--surface4);color:var(--text)}
+.nbadge{display:flex;align-items:center;gap:6px;background:var(--red-dim);border:1px solid rgba(230,57,70,.3);color:#ff8a92;font-size:11px;font-weight:600;font-family:var(--fm);padding:3px 10px;border-radius:20px}
+.npulse{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.2s infinite}
+
+.view{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;overflow:hidden}
+.view.active{display:block}
+
+.sv-wrap{height:100%;display:flex;justify-content:center;align-items:center;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(230,57,70,.06) 0%,transparent 70%),var(--bg);overflow-y:auto;padding:20px 16px}
+.phone{width:375px;height:695px;background:var(--surface);border-radius:36px;border:1px solid var(--border2);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 0 1px rgba(255,255,255,.03),0 40px 80px rgba(0,0,0,.7);flex-shrink:0}
+.ph-topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 18px 10px;border-bottom:1px solid var(--border)}
+.ph-left{display:flex;align-items:center;gap:9px}
+.ph-avatar{width:30px;height:30px;border-radius:50%;background:var(--blue-dim);border:1px solid rgba(58,123,213,.4);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:11px;font-weight:700;color:#7aabee}
+.ph-title{font-family:var(--fh);font-size:13px;font-weight:700}
+.ph-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.sig{display:flex;align-items:flex-end;gap:2px;height:13px}
+.sig span{width:3px;background:var(--green);border-radius:1px;opacity:.7}
+.sig span:nth-child(1){height:4px}.sig span:nth-child(2){height:7px}.sig span:nth-child(3){height:10px}.sig span:nth-child(4){height:13px;opacity:.25}
+
+.ph-screen{flex:1;overflow-y:auto;padding:13px 13px 8px;display:flex;flex-direction:column;gap:11px;scrollbar-width:none}
+.ph-screen::-webkit-scrollbar{display:none}
+
+.sos-area{display:flex;flex-direction:column;align-items:center;padding:14px 0 4px;gap:11px}
+.sos-outer{width:148px;height:148px;border-radius:50%;background:radial-gradient(circle,rgba(230,57,70,.1) 0%,rgba(230,57,70,.03) 60%,transparent 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;position:relative}
+.sos-ring{width:128px;height:128px;border-radius:50%;background:rgba(230,57,70,.08);display:flex;align-items:center;justify-content:center;position:relative}
+.sos-svg{position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);transform:rotate(-90deg);pointer-events:none}
+.sos-arc{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .04s linear}
+.sos-btn{width:106px;height:106px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ff6b74,#cc2030);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:25px;font-weight:800;color:white;letter-spacing:3px;transition:transform .12s,box-shadow .12s;box-shadow:0 8px 24px rgba(230,57,70,.4),inset 0 1px 0 rgba(255,255,255,.15)}
+.sos-outer.holding .sos-btn{transform:scale(.92);box-shadow:0 4px 12px rgba(230,57,70,.3)}
+.sos-hint{font-size:10px;color:var(--text3);font-family:var(--fm);letter-spacing:1px;text-transform:uppercase}
+
+.scard{background:var(--surface2);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.scard-head{padding:10px 13px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.scard-head h4{font-family:var(--fh);font-size:13px;font-weight:700}
+.chev{font-size:10px;color:var(--text3);transition:transform .2s}
+.chev.closed{transform:rotate(180deg)}
+.scard-body{padding:9px 13px 13px}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.stag{padding:9px 11px;border-radius:9px;background:var(--surface3);border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;text-align:center;transition:all .15s;user-select:none;position:relative}
+.stag:hover{border-color:var(--border2);color:var(--text)}
+.stag.on-r{background:var(--red-dim);border-color:rgba(230,57,70,.4);color:#ff8a92}
+.stag-badge{position:absolute;top:2px;right:2px;background:var(--text);color:var(--surface);border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--fm)}
+
+.p2p-card{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:9px}
+.p2p-head{display:flex;align-items:center;gap:8px}
+.p2p-ico{width:26px;height:26px;border-radius:7px;background:var(--green-dim);border:1px solid rgba(46,204,138,.25);display:flex;align-items:center;justify-content:center}
+.p2p-ico svg{width:13px;height:13px;stroke:var(--green);fill:none;stroke-width:1.5}
+.p2p-head h4{font-family:var(--fh);font-size:13px;font-weight:700}
+.p2p-desc{font-size:11px;color:var(--text2);line-height:1.5}
+.btn-primary{width:100%;padding:9px;border-radius:8px;background:var(--blue);color:white;font-family:var(--fb);font-size:12px;font-weight:600;border:none;cursor:pointer;text-align:center;transition:background .15s}
+.btn-primary:hover{background:rgba(58,123,213,.8)}
+.img-upload-btn{width:100%;padding:8px;border-radius:8px;background:var(--surface3);color:var(--text3);font-family:var(--fb);font-size:11px;font-weight:500;border:1px dashed var(--border2);cursor:not-allowed;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;opacity:.5;margin-top:9px}
+.img-upload-btn.active{cursor:pointer;opacity:1;border-color:var(--amber);color:var(--amber)}
+#img-upload-input{display:none}
+
+.alert-sent-scr{display:none;flex-direction:column;align-items:center;gap:15px;padding:13px 0 5px}
+.sos-sent-ring{width:148px;height:148px;border-radius:50%;background:rgba(230,57,70,.08);display:flex;align-items:center;justify-content:center;animation:sentPulse 2s infinite}
+.sos-sent-c{width:106px;height:106px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ff6b74,#cc2030);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:25px;font-weight:800;color:white;letter-spacing:3px;box-shadow:0 8px 24px rgba(230,57,70,.4)}
+.alert-sent-card{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:13px}
+.sent-title{display:flex;align-items:center;gap:7px;font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:11px}
+.check-c{width:18px;height:18px;border-radius:50%;background:var(--green-dim);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--green);flex-shrink:0}
+.rnotif{background:var(--surface3);border-radius:9px;padding:10px;display:flex;gap:8px;border:1px solid var(--border);animation:slideUp .3s ease-out}
+.rnotif-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+.rnotif h5{font-size:12px;font-weight:600;margin-bottom:3px}
+.rnotif p{font-size:11px;color:var(--text2);line-height:1.4}
+.wait-blk{margin-top:11px}
+.wait-lbl{font-size:9px;font-family:var(--fm);color:var(--text3);letter-spacing:1.5px;margin-bottom:8px}
+.btn-cancel-a{width:100%;padding:8px;border-radius:8px;background:transparent;color:var(--text3);font-family:var(--fb);font-size:11px;border:1px solid var(--border);cursor:pointer;transition:color .15s}
+.btn-cancel-a:hover{color:var(--text2)}
+
+.map-container{width:100%;height:100%;position:relative;background:#06080e;display:flex;flex-direction:column}
+#map-canvas{width:100%;flex:1;display:block}
+.distance-filter{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:8px 12px;display:flex;gap:6px;align-items:center;animation:slideUp .3s}
+.dist-btn{padding:6px 12px;border-radius:8px;background:var(--surface3);border:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.dist-btn.active{background:var(--blue);border-color:var(--blue);color:white}
+.dist-btn:hover{border-color:var(--border2)}
+.btn-p2p-chat{position:absolute;bottom:95px;left:50%;transform:translateX(-50%);z-index:10;background:var(--green);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;animation:slideUp .3s}
+.btn-p2p-chat:hover{background:rgba(46,204,138,.85)}
+
+.chat-container{display:flex;flex-direction:column;height:100%;background:var(--surface)}
+.chat-header{padding:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--red-dim);border:1px solid rgba(230,57,70,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#ff8a92;flex-shrink:0}
+.chat-info h4{font-size:12px;font-weight:700;margin-bottom:2px}
+.chat-info p{font-size:10px;color:var(--text3)}
+.messages-list{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px;scrollbar-width:none}
+.messages-list::-webkit-scrollbar{display:none}
+.msg{display:flex;gap:8px;animation:fadeIn .3s}
+.msg.them .msg-content{background:var(--surface2);color:var(--text2)}
+.msg.us .msg-content{background:var(--blue-dim);color:#7aabee;margin-left:auto}
+.msg-content{padding:8px 11px;border-radius:9px;font-size:11px;line-height:1.4;max-width:75%;word-wrap:break-word}
+.msg-time{font-size:9px;color:var(--text3);font-family:var(--fm);margin-top:2px}
+.chat-input-area{padding:11px;border-top:1px solid var(--border);display:flex;gap:6px;align-items:flex-end}
+.chat-input{flex:1;padding:7px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-size:11px;resize:none;max-height:60px;line-height:1.3;outline:none}
+.chat-input:focus{border-color:var(--blue)}
+.chat-btn{width:30px;height:30px;border-radius:6px;background:var(--surface3);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;transition:all .15s}
+.chat-btn:hover{background:var(--blue);color:white;border-color:var(--blue)}
+.chat-send{background:var(--blue);color:white;border:none}
+.chat-send:hover{background:rgba(58,123,213,.8)}
+
+.profile-container{overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:13px;height:100%}
+.profile-section{background:var(--surface2);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.profile-section-head{padding:11px 13px;background:var(--surface3);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;font-family:var(--fh);cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all .15s}
+.profile-section-head:hover{background:rgba(255,255,255,.05)}
+.profile-chev{font-size:10px;color:var(--text3);transition:transform .2s;display:inline-block}
+.profile-section-body{padding:11px 13px;display:flex;flex-direction:column;gap:9px}
+.profile-field{display:flex;flex-direction:column;gap:4px}
+.profile-label{font-size:10px;color:var(--text3);font-family:var(--fm);letter-spacing:.5px}
+.edit-input{width:100%;padding:7px 9px;border-radius:7px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-size:11px;outline:none}
+.edit-input:focus{border-color:var(--blue)}
+.profile-empty{font-size:11px;color:var(--text3);padding:8px 0;display:flex;align-items:center;justify-content:space-between}
+.add-btn{width:20px;height:20px;border-radius:4px;background:var(--blue);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.add-btn:hover{background:rgba(58,123,213,.8)}
+.profile-item{padding:8px;background:var(--surface);border-radius:8px;border:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between;align-items:center}
+.btn-save-profile{width:100%;padding:10px;border-radius:8px;background:var(--green);color:white;border:none;font-weight:600;cursor:pointer;font-family:var(--fb);margin-top:8px;transition:background .15s}
+.btn-save-profile:hover{background:rgba(46,204,138,.85)}
+
+.ph-nav{display:flex;justify-content:space-around;padding:9px 0 11px;border-top:1px solid var(--border);background:rgba(12,16,24,.97);flex-shrink:0}
+.ph-nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;flex:1}
+.ph-nav-icon{font-size:20px}
+.ph-nav-lbl{font-size:9px;color:var(--text2);font-family:var(--fm)}
+.ph-nav-btn.active .ph-nav-icon{color:var(--red)}
+.ph-nav-btn.active .ph-nav-lbl{color:var(--red)}
+
+.co-wrap{height:100%;display:flex;flex-direction:column;background:var(--bg);padding:0}
+.co-head{display:flex;gap:9px;padding:13px;border-bottom:1px solid var(--border);background:rgba(12,16,24,.97)}
+.co-tab{padding:8px 13px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);font-family:var(--fb);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s}
+.co-tab.active{background:var(--blue);color:white;border-color:var(--blue)}
+.co-body{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px}
+.arow{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;cursor:pointer;transition:all .15s}
+.arow:hover{border-color:var(--border2)}
+.arow.sel{border-color:var(--blue);background:rgba(58,123,213,.1)}
+.arow-top{display:flex;justify-content:space-between;margin-bottom:6px}
+.arow-name{font-size:12px;font-weight:600}
+.arow-time{font-size:10px;color:var(--text3);font-family:var(--fm)}
+.abadges{display:flex;gap:6px}
+.bdg{font-size:9px;padding:3px 8px;border-radius:5px;font-weight:500}
+.bdg-r{background:var(--red-dim);color:#ff8a92}
+.bdg-g{background:var(--green-dim);color:var(--green)}
+.mission-card{background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:13px;margin-bottom:13px}
+.mission-card h3{font-family:var(--fh);font-size:13px;font-weight:700;margin-bottom:8px}
+.mission-txt{font-size:11px;color:var(--text2);line-height:1.5}
+.empty-r{text-align:center;padding:40px 20px;color:var(--text3);font-size:11px}
+
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);padding:9px 13px;border-radius:8px;font-size:11px;color:var(--text2);z-index:99999;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.show{opacity:1;pointer-events:auto}
+
+#demo-banner{position:fixed;bottom:0;left:0;right:0;z-index:99998;background:rgba(6,8,14,.97);border-top:1px solid rgba(244,164,41,.3);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;backdrop-filter:blur(12px);animation:slideUp .4s ease-out}
+.demo-inner{display:flex;align-items:center;gap:11px}
+.demo-icon{width:28px;height:28px;border-radius:7px;background:rgba(244,164,41,.12);border:1px solid rgba(244,164,41,.3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.demo-text h5{font-family:var(--fh);font-size:12px;font-weight:700;color:var(--amber);margin-bottom:2px}
+.demo-text p{font-size:10px;color:var(--text2);line-height:1.4}
+.demo-text a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(244,164,41,.3)}
+.demo-text a:hover{opacity:.8}
+.demo-dismiss{padding:5px 14px;border-radius:7px;background:rgba(244,164,41,.1);border:1px solid rgba(244,164,41,.25);color:var(--amber);font-family:var(--fb);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.demo-dismiss:hover{background:rgba(244,164,41,.2)}
+
+/* COORDINATOR LAYOUT */
+.co-wrap{display:grid;grid-template-columns:1fr 365px;grid-template-rows:50px 1fr 145px;height:100%}
+.co-hdr{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:14px}
+.co-hdr-l{display:flex;align-items:center;gap:11px}
+.co-shield{width:28px;height:28px;border-radius:7px;background:var(--green-dim);border:1px solid rgba(46,204,138,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.co-shield svg{width:14px;height:14px;stroke:var(--green);fill:none;stroke-width:1.5}
+.co-t h3{font-family:var(--fh);font-size:13px;font-weight:700}
+.co-t p{font-size:10px;color:var(--text2);margin-top:1px}
+.act-badge{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:11px;color:var(--red);background:var(--red-dim);border:1px solid rgba(230,57,70,.25);padding:3px 10px;border-radius:20px}
+.act-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.2s infinite;flex-shrink:0}
+
+.map-wrap{position:relative;overflow:hidden;grid-row:2;grid-column:1}
+#map{width:100%;height:100%}
+.map-ot{position:absolute;top:11px;left:11px;z-index:1000;background:rgba(6,8,14,.88);backdrop-filter:blur(10px);border:1px solid var(--border2);border-radius:9px;padding:7px 12px;font-family:var(--fh);font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
+.map-rdot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1.5s infinite}
+.map-leg{position:absolute;bottom:11px;left:11px;z-index:1000;background:rgba(6,8,14,.88);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:9px;padding:7px 12px;display:flex;gap:13px}
+.leg-i{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);font-family:var(--fm)}
+.leg-d{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+.assign-wrap{grid-row:3;grid-column:1;background:var(--surface);border-top:1px solid var(--border);padding:11px 15px;display:flex;flex-direction:column;gap:8px}
+.assign-top{display:flex;justify-content:space-between;align-items:center}
+.assign-top h4{font-family:var(--fh);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.assign-top h4 svg{width:13px;height:13px;stroke:var(--text2);fill:none;stroke-width:1.5}
+.btn-dist{padding:5px 13px;border-radius:7px;background:var(--green-dim);border:1px solid rgba(46,204,138,.25);color:var(--green);font-family:var(--fb);font-size:11px;font-weight:600;cursor:not-allowed;opacity:.5;display:flex;align-items:center;gap:4px}
+.assign-tabs{display:flex;gap:6px}
+.atab{flex:1;padding:7px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);font-family:var(--fb);font-size:11px;font-weight:500;cursor:pointer;text-align:center;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px}
+.atab svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.5}
+.atab:hover{border-color:var(--border2);color:var(--text)}
+.atab.active{background:var(--surface4);border-color:rgba(58,123,213,.4);color:var(--text)}
+.atab.ai{background:var(--blue-dim);border-color:rgba(58,123,213,.2);color:#7aabee;cursor:not-allowed;opacity:.6}
+.teams-row{display:flex;gap:6px;flex-wrap:wrap}
+.tchip{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;background:var(--surface3);border:1px solid var(--border);font-size:10px;font-family:var(--fm);color:var(--text2)}
+.tcdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+.sidebar{grid-row:2/4;grid-column:2;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:13px 13px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-head h3{font-family:var(--fh);font-size:13px;font-weight:700}
+.alerts-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface4) transparent}
+
+.agrp-hdr{display:flex;justify-content:space-between;align-items:center;padding:7px 13px;cursor:pointer;user-select:none}
+.agrp-hdr:hover{background:rgba(255,255,255,.02)}
+.agrp-lbl{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--fm);font-weight:500;letter-spacing:.8px;color:var(--text3)}
+.agrp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.agrp-r{display:flex;align-items:center;gap:5px}
+.agrp-cnt{font-size:10px;font-family:var(--fm);color:var(--text3)}
+.mchev{font-size:9px;color:var(--text3);transition:transform .2s;display:inline-block}
+.mchev.dn{transform:rotate(180deg)}
+
+.arow{margin:3px 7px;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:border-color .15s,background .15s}
+.arow:hover{border-color:var(--border2)}
+.arow.sel{border-color:rgba(58,123,213,.5);background:var(--surface3)}
+.arow-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.arow-name{font-family:var(--fh);font-size:12px;font-weight:700}
+.arow-time{font-size:9px;font-family:var(--fm);color:var(--text3);white-space:nowrap}
+.abadges{display:flex;gap:4px;flex-wrap:wrap}
+.bdg{font-size:9px;font-family:var(--fm);padding:2px 6px;border-radius:20px}
+.bdg-r{background:var(--red-dim);color:#ff8a92;border:1px solid rgba(230,57,70,.25)}
+.bdg-b{background:var(--blue-dim);color:#7aabee;border:1px solid rgba(58,123,213,.25)}
+.bdg-g{background:var(--surface3);color:var(--text2);border:1px solid var(--border)}
+
+.mission-panel{border-top:1px solid var(--border);padding:11px 13px;flex-shrink:0}
+.mp-title{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.mission-panel p{font-size:11px;color:var(--text3);line-height:1.55}
+
+/* ALERT ACTION BUTTONS */
+.arow-actions{display:flex;gap:6px;margin-top:8px}
+.arow-action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px 0;border-radius:7px;font-size:10px;font-weight:600;font-family:var(--fb);border:none;cursor:pointer;transition:all .15s}
+.arow-action-btn.dispatch{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,138,.3)}
+.arow-action-btn.dispatch:hover{background:rgba(46,204,138,.25)}
+.arow-action-btn.chat-btn{background:var(--blue-dim);color:#7aabee;border:1px solid rgba(58,123,213,.3)}
+.arow-action-btn.chat-btn:hover{background:rgba(58,123,213,.25)}
+.arow-action-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+
+/* COORDINATOR CHAT PANEL */
+.co-chat-panel{display:none;position:absolute;bottom:0;left:0;right:0;top:0;background:var(--surface);z-index:100;flex-direction:column}
+.co-chat-panel.open{display:flex}
+.co-chat-hdr{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.co-chat-hdr-l{display:flex;align-items:center;gap:8px}
+.co-chat-av{width:28px;height:28px;border-radius:50%;background:var(--red-dim);border:1px solid rgba(230,57,70,.3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#ff8a92;font-family:var(--fh);flex-shrink:0}
+.co-chat-name{font-family:var(--fh);font-size:12px;font-weight:700}
+.co-chat-sub{font-size:9px;color:var(--text3);margin-top:1px}
+.co-chat-close{background:var(--surface3);border:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:var(--fb)}
+.co-chat-close:hover{color:var(--text)}
+.co-chat-msgs{flex:1;overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin}
+.co-msg{display:flex;flex-direction:column;animation:fadeIn .25s}
+.co-msg.them .co-msg-bubble{background:var(--surface2);color:var(--text2);align-self:flex-start}
+.co-msg.us .co-msg-bubble{background:var(--blue-dim);color:#7aabee;align-self:flex-end}
+.co-msg-bubble{padding:7px 10px;border-radius:9px;font-size:11px;line-height:1.4;max-width:80%;word-wrap:break-word}
+.co-msg-time{font-size:9px;color:var(--text3);font-family:var(--fm);margin-top:2px;padding:0 2px}
+.co-msg.us .co-msg-time{text-align:right}
+.co-chat-input-row{padding:9px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0}
+.co-chat-input{flex:1;padding:7px 10px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-size:11px;outline:none}
+.co-chat-input:focus{border-color:var(--blue)}
+.co-chat-send{width:30px;height:30px;border-radius:6px;background:var(--blue);border:none;color:white;cursor:pointer;font-size:13px;flex-shrink:0}
+.co-chat-send:hover{background:rgba(58,123,213,.8)}
+</style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="logo">
+    <div class="logo-box"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15 8H9L12 2Z" fill="currentColor"></path><path d="M8 10H16L13 18H11L8 10Z" fill="currentColor"></path></svg></div>
+    <div style="display:flex;flex-direction:column;gap:1px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span>GroundSOS</span>
+        <a href="https://groundsos.com/" target="_blank" style="font-size:11px;font-weight:500;color:white;font-family:var(--fb);text-decoration:none;letter-spacing:0;border-bottom:1px solid rgba(255,255,255,0.3);padding-bottom:1px">groundsos.com</a>
+        <a href="mailto:hello.groundsos@gmail.com" style="font-size:11px;font-weight:500;color:white;font-family:var(--fb);text-decoration:none;letter-spacing:0;border-bottom:1px solid rgba(255,255,255,0.3);padding-bottom:1px">hello.groundsos@gmail.com</a>
+      </div>
+      <span style="font-size:9px;font-weight:400;color:white;font-family:var(--fm);letter-spacing:.5px">v.01.05.2026</span>
+    </div>
+  </div>
+  <div class="vtoggle">
+    <div class="vbtn active" onclick="switchView(&#39;survivor&#39;)">Survivor</div>
+    <div class="vbtn" onclick="switchView(&#39;coordinator&#39;)">Coordinator</div>
+  </div>
+  <div class="nbadge" id="top-alert-badge" style="display:none"><span class="npulse"></span><span id="top-badge">4 Active Alerts</span></div>
+</div>
+
+<div class="view active" id="v-survivor">
+  <div class="sv-wrap">
+    <div class="phone">
+      <div class="ph-topbar">
+        <div class="ph-left">
+          <div class="ph-avatar">SV</div>
+          <div>
+            <div class="ph-title">Survivor</div>
+            <div class="ph-sub">Live location</div>
+          </div>
+        </div>
+        <div class="sig"><span></span><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="ph-screen" id="ph-screen">
+        <div id="scr-normal">
+          <div class="sos-area">
+            <div class="sos-outer" id="sos-outer" onmousedown="sosStart(event)" onmouseup="sosStop(event)" onmouseleave="sosStop(event)" ontouchstart="sosStart(event)" ontouchend="sosStop(event)">
+              <div class="sos-ring">
+                <svg class="sos-svg" viewBox="0 0 130 130"><circle class="sos-arc" id="sos-arc" cx="65" cy="65" r="62" style="stroke-dasharray: 389.557; stroke-dashoffset: 389.557;"></circle></svg>
+                <div class="sos-btn">SOS</div>
+              </div>
+            </div>
+            <div class="sos-hint">Hold to send SOS</div>
+          </div>
+
+          <div class="scard">
+            <div class="scard-head" onclick="toggleStatus()">
+              <h4>Status</h4>
+              <span class="chev" id="sc-chev">▲</span>
+            </div>
+            <div class="scard-body" id="sc-body">
+              <div class="sgrid">
+                <div class="stag" onclick="toggleTag(this)">Injured</div>
+                <div class="stag" onclick="toggleTag(this)">Bleeding</div>
+                <div class="stag" onclick="toggleTag(this)">Alone<span class="stag-badge" style="display:none">0</span></div>
+                <div class="stag" onclick="toggleTag(this)">In Group<span class="stag-badge" style="display:none">0</span></div>
+                <div class="stag" onclick="toggleTag(this)">Kids<span class="stag-badge" style="display:none">0</span></div>
+                <div class="stag" onclick="toggleTag(this)">Pets<span class="stag-badge" style="display:none">0</span></div>
+              </div>
+              <button class="img-upload-btn" id="img-upload-btn" style="opacity:0.5" title="Disabled - activate SOS to enable">
+                📷 Add image to status
+              </button>
+              <input type="file" id="img-upload-input" accept="image/*">
+            </div>
+          </div>
+
+          <div class="p2p-card">
+            <div class="p2p-head">
+              <div class="p2p-ico"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"></path></svg></div>
+              <h4>Peer-2-Peer Support</h4>
+            </div>
+            <p class="p2p-desc">3 survivors nearby. Coordinate with others for mutual aid and shared resources.</p>
+            <button class="btn-primary" onclick="openNearbyMap()">Connect with Nearby Survivors</button>
+          </div>
+        </div>
+
+        <div id="scr-sent" class="alert-sent-scr">
+          <div class="sos-sent-ring">
+            <div class="sos-sent-c">SOS</div>
+          </div>
+          <div class="alert-sent-card">
+            <div class="sent-title">
+              <div class="check-c">✓</div>
+              <span>Alert Sent</span>
+            </div>
+            <div id="alerts-container"></div>
+            <div class="wait-blk">
+              <div class="wait-lbl">RESCUE TEAM STATUS</div>
+              <div id="rescue-status" style="font-size:11px;color:var(--text2);line-height:1.5">Broadcast sent. Awaiting response from rescue coordinators...</div>
+            </div>
+          </div>
+          <button class="btn-cancel-a" onclick="cancelAlert()">Cancel SOS</button>
+        </div>
+      </div>
+
+      <div class="ph-nav">
+        <div class="ph-nav-btn active" onclick="switchTab(this, &#39;home&#39;)">
+          <div class="ph-nav-icon">🏠</div>
+          <div class="ph-nav-lbl">Home</div>
+        </div>
+        <div class="ph-nav-btn" onclick="switchTab(this, &#39;map&#39;)">
+          <div class="ph-nav-icon">🗺️</div>
+          <div class="ph-nav-lbl">Map</div>
+        </div>
+        <div class="ph-nav-btn" onclick="switchTab(this, &#39;chat&#39;)">
+          <div class="ph-nav-icon">💬</div>
+          <div class="ph-nav-lbl">Chat</div>
+        </div>
+        <div class="ph-nav-btn" onclick="switchTab(this, &#39;profile&#39;)">
+          <div class="ph-nav-icon">👤</div>
+          <div class="ph-nav-lbl">Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="v-coordinator">
+  <div class="co-wrap">
+    <div class="co-hdr">
+      <div class="co-hdr-l">
+        <div class="co-shield"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7L12 2z"></path></svg></div>
+        <div class="co-t"><h3>Coordinator Console</h3><p>Live SOS · team &amp; fleet dispatch · mission updates</p></div>
+      </div>
+      <div class="act-badge"><div class="act-dot"></div><span id="co-badge">4 Active Alerts</span></div>
+    </div>
+
+    <div class="map-wrap">
+      <div class="map-ot"><div class="map-rdot"></div>Live Rescue Requests</div>
+      <div id="map">
+        <svg id="co-map-svg" width="100%" height="100%" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialgradient id="mgrd" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#0d1520"></stop>
+              <stop offset="100%" stop-color="#06080e"></stop>
+            </radialgradient>
+            <filter id="glow-r">
+              <fegaussianblur stdDeviation="3" result="blur"></fegaussianblur>
+              <femerge><femergenode in="blur"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge>
+            </filter>
+            <filter id="glow-g">
+              <fegaussianblur stdDeviation="2.5" result="blur"></fegaussianblur>
+              <femerge><femergenode in="blur"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge>
+            </filter>
+          </defs>
+
+          <!-- Background -->
+          <rect width="800" height="500" fill="url(#mgrd)"></rect>
+
+          <!-- Grid lines (streets) -->
+          <!-- Horizontal major -->
+          <line x1="0" y1="80" x2="800" y2="80" stroke="#1a2535" stroke-width="8"></line>
+          <line x1="0" y1="180" x2="800" y2="180" stroke="#1a2535" stroke-width="8"></line>
+          <line x1="0" y1="280" x2="800" y2="280" stroke="#1a2535" stroke-width="12"></line>
+          <line x1="0" y1="380" x2="800" y2="380" stroke="#1a2535" stroke-width="8"></line>
+          <line x1="0" y1="460" x2="800" y2="460" stroke="#1a2535" stroke-width="6"></line>
+          <!-- Horizontal minor -->
+          <line x1="0" y1="130" x2="800" y2="130" stroke="#111820" stroke-width="3"></line>
+          <line x1="0" y1="230" x2="800" y2="230" stroke="#111820" stroke-width="3"></line>
+          <line x1="0" y1="330" x2="800" y2="330" stroke="#111820" stroke-width="3"></line>
+          <line x1="0" y1="430" x2="800" y2="430" stroke="#111820" stroke-width="3"></line>
+
+          <!-- Vertical major -->
+          <line x1="100" y1="0" x2="100" y2="500" stroke="#1a2535" stroke-width="8"></line>
+          <line x1="220" y1="0" x2="220" y2="500" stroke="#1a2535" stroke-width="12"></line>
+          <line x1="360" y1="0" x2="360" y2="500" stroke="#1a2535" stroke-width="8"></line>
+          <line x1="500" y1="0" x2="500" y2="500" stroke="#1a2535" stroke-width="14"></line>
+          <line x1="640" y1="0" x2="640" y2="500" stroke="#1a2535" stroke-width="8"></line>
+          <line x1="750" y1="0" x2="750" y2="500" stroke="#1a2535" stroke-width="6"></line>
+          <!-- Vertical minor -->
+          <line x1="160" y1="0" x2="160" y2="500" stroke="#111820" stroke-width="3"></line>
+          <line x1="290" y1="0" x2="290" y2="500" stroke="#111820" stroke-width="3"></line>
+          <line x1="430" y1="0" x2="430" y2="500" stroke="#111820" stroke-width="3"></line>
+          <line x1="570" y1="0" x2="570" y2="500" stroke="#111820" stroke-width="3"></line>
+          <line x1="695" y1="0" x2="695" y2="500" stroke="#111820" stroke-width="3"></line>
+
+          <!-- Diagonal road -->
+          <line x1="0" y1="500" x2="500" y2="0" stroke="#1a2535" stroke-width="7"></line>
+
+          <!-- City blocks (filled rectangles between streets) -->
+          <rect x="101" y="81" width="118" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="221" y="81" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="361" y="81" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="501" y="81" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="641" y="81" width="108" height="98" fill="#0c1220" rx="2"></rect>
+
+          <rect x="101" y="181" width="118" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="221" y="181" width="138" height="98" fill="#0d1422" rx="2"></rect>
+          <rect x="361" y="181" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="501" y="181" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="641" y="181" width="108" height="98" fill="#0c1220" rx="2"></rect>
+
+          <rect x="101" y="281" width="118" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="221" y="281" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="361" y="281" width="138" height="98" fill="#0d1422" rx="2"></rect>
+          <rect x="501" y="281" width="138" height="98" fill="#0c1220" rx="2"></rect>
+          <rect x="641" y="281" width="108" height="98" fill="#0c1220" rx="2"></rect>
+
+          <rect x="101" y="381" width="118" height="78" fill="#0c1220" rx="2"></rect>
+          <rect x="221" y="381" width="138" height="78" fill="#0c1220" rx="2"></rect>
+          <rect x="361" y="381" width="138" height="78" fill="#0c1220" rx="2"></rect>
+          <rect x="501" y="381" width="138" height="78" fill="#0c1220" rx="2"></rect>
+          <rect x="641" y="381" width="108" height="78" fill="#0c1220" rx="2"></rect>
+
+          <!-- Park / open area -->
+          <rect x="221" y="181" width="138" height="98" fill="#0d1f18" rx="2" opacity="0.8"></rect>
+          <rect x="361" y="281" width="138" height="98" fill="#0d1f18" rx="2" opacity="0.8"></rect>
+
+          <!-- Street name labels -->
+          <text x="160" y="275" fill="#1e2e42" font-size="9" font-family="IBM Plex Mono" text-anchor="middle" transform="rotate(-90,160,275)">RUA CENTRAL</text>
+          <text x="500" y="250" fill="#1e2e42" font-size="9" font-family="IBM Plex Mono" text-anchor="middle" transform="rotate(-90,500,250)">AV. PRINCIPAL</text>
+          <text x="400" y="278" fill="#1e2e42" font-size="9" font-family="IBM Plex Mono" text-anchor="middle">EN-16</text>
+          <text x="400" y="82" fill="#1e2e42" font-size="9" font-family="IBM Plex Mono" text-anchor="middle">ESTRADA NORTE</text>
+
+          <!-- ── PULSE RINGS (SOS survivors) ── -->
+          <!-- Olha Mokreieva -->
+          <circle cx="270" cy="230" r="22" fill="none" stroke="#e63946" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="14;28;14" dur="2s" repeatCount="indefinite"></animate>
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" repeatCount="indefinite"></animate>
+          </circle>
+          <!-- Marco D -->
+          <circle cx="460" cy="140" r="22" fill="none" stroke="#e63946" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="14;28;14" dur="2.3s" repeatCount="indefinite"></animate>
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.3s" repeatCount="indefinite"></animate>
+          </circle>
+          <!-- Sara N -->
+          <circle cx="580" cy="330" r="22" fill="none" stroke="#e63946" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="14;28;14" dur="1.8s" repeatCount="indefinite"></animate>
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="1.8s" repeatCount="indefinite"></animate>
+          </circle>
+          <!-- James O -->
+          <circle cx="155" cy="340" r="22" fill="none" stroke="#e63946" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="14;28;14" dur="2.5s" repeatCount="indefinite"></animate>
+            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.5s" repeatCount="indefinite"></animate>
+          </circle>
+
+          <!-- ── SURVIVOR PINS (red) ── -->
+          <!-- Olha Mokreieva -->
+          <circle cx="270" cy="230" r="9" fill="#e63946" filter="url(#glow-r)"></circle>
+          <circle cx="270" cy="230" r="5" fill="white" opacity="0.9"></circle>
+          <text x="282" y="221" fill="#ff8a92" font-size="9" font-family="IBM Plex Mono" font-weight="600">Olha M.</text>
+
+          <!-- Marco D -->
+          <circle cx="460" cy="140" r="9" fill="#e63946" filter="url(#glow-r)"></circle>
+          <circle cx="460" cy="140" r="5" fill="white" opacity="0.9"></circle>
+          <text x="472" y="131" fill="#ff8a92" font-size="9" font-family="IBM Plex Mono" font-weight="600">Marco D*</text>
+
+          <!-- Sara N -->
+          <circle cx="580" cy="330" r="9" fill="#e63946" filter="url(#glow-r)"></circle>
+          <circle cx="580" cy="330" r="5" fill="white" opacity="0.9"></circle>
+          <text x="592" y="321" fill="#ff8a92" font-size="9" font-family="IBM Plex Mono" font-weight="600">Sara N*</text>
+
+          <!-- James O -->
+          <circle cx="155" cy="340" r="9" fill="#e63946" filter="url(#glow-r)"></circle>
+          <circle cx="155" cy="340" r="5" fill="white" opacity="0.9"></circle>
+          <text x="167" y="331" fill="#ff8a92" font-size="9" font-family="IBM Plex Mono" font-weight="600">James O*</text>
+
+          <!-- ── TEAM PINS (green) ── -->
+          <!-- Alpha Team -->
+          <circle cx="390" cy="410" r="8" fill="#2ecc8a" filter="url(#glow-g)"></circle>
+          <circle cx="390" cy="410" r="4" fill="white" opacity="0.9"></circle>
+          <text x="402" y="415" fill="#2ecc8a" font-size="9" font-family="IBM Plex Mono">Alpha Team</text>
+
+          <!-- Bravo Medical -->
+          <circle cx="660" cy="200" r="8" fill="#2ecc8a" filter="url(#glow-g)"></circle>
+          <circle cx="660" cy="200" r="4" fill="white" opacity="0.9"></circle>
+          <text x="672" y="205" fill="#2ecc8a" font-size="9" font-family="IBM Plex Mono">Bravo Medical</text>
+
+          <!-- ── ROUTE LINES (team to survivor) ── -->
+          <line x1="390" y1="410" x2="270" y2="230" stroke="#2ecc8a" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"></line>
+          <line x1="660" y1="200" x2="460" y2="140" stroke="#2ecc8a" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.4"></line>
+
+          <!-- Coordinates watermark -->
+          <text x="12" y="492" fill="#1a2535" font-size="8" font-family="IBM Plex Mono">40.6540° N · 7.9240° W</text>
+          <text x="700" y="492" fill="#1a2535" font-size="8" font-family="IBM Plex Mono" text-anchor="end">© GroundSOS LIVE</text>
+        </svg>
+      </div>
+      <div class="map-leg">
+        <div class="leg-i"><div class="leg-d" style="background:#e63946"></div>SOS Open</div>
+        <div class="leg-i"><div class="leg-d" style="background:#3a7bd5"></div>In Progress</div>
+        <div class="leg-i"><div class="leg-d" style="background:#2ecc8a"></div>Team</div>
+      </div>
+    </div>
+
+    <div class="assign-wrap">
+      <div class="assign-top">
+        <h4>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"></path></svg>
+          Assign team
+        </h4>
+        <button class="btn-dist">⬡ Distribute</button>
+      </div>
+      <div class="assign-tabs">
+        <div class="atab active" onclick="pickTab(this)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>Single
+        </div>
+        <div class="atab" onclick="pickTab(this)">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>Area
+        </div>
+        <div class="atab ai">✦ AI Best</div>
+      </div>
+      <div class="teams-row">
+        <div class="tchip"><div class="tcdot" style="background:#2ecc8a"></div>Alpha Team · 2.1km</div>
+        <div class="tchip"><div class="tcdot" style="background:#2ecc8a"></div>Bravo Medical · 3.4km</div>
+        <div class="tchip"><div class="tcdot" style="background:var(--amber)"></div>Charlie · Standby</div>
+        <div class="tchip"><div class="tcdot" style="background:var(--text3)"></div>Delta · Offline</div>
+      </div>
+    </div>
+
+    <div class="sidebar" style="position:relative">
+      <div class="co-chat-panel" id="co-chat-panel">
+        <div class="co-chat-hdr">
+          <div class="co-chat-hdr-l">
+            <div class="co-chat-av" id="co-chat-av">?</div>
+            <div>
+              <div class="co-chat-name" id="co-chat-name">—</div>
+              <div class="co-chat-sub">Survivor · Live connection</div>
+            </div>
+          </div>
+          <button class="co-chat-close" onclick="closeCoChat()">✕ Close</button>
+        </div>
+        <div class="co-chat-msgs" id="co-chat-msgs"></div>
+        <div class="co-chat-input-row">
+          <input class="co-chat-input" id="co-chat-input" placeholder="Message survivor..." onkeypress="if(event.key===&#39;Enter&#39;)sendCoMsg()">
+          <button class="co-chat-send" onclick="sendCoMsg()">→</button>
+        </div>
+      </div>
+      <div class="sb-head"><h3>Active Emergencies</h3></div>
+      <div class="alerts-scroll">
+        <!-- OPEN -->
+        <div class="agrp-hdr" onclick="toggleGrp(&#39;open&#39;)">
+          <div class="agrp-lbl"><div class="agrp-dot" style="background:var(--red)"></div>OPEN</div>
+          <div class="agrp-r"><span class="agrp-cnt" id="cnt-open">4</span><span class="mchev" id="chev-open">▲</span></div>
+        </div>
+        <div id="body-open">
+          <div class="arow" onclick="pickAlert(this,&#39;a1&#39;)">
+            <div class="arow-top"><div class="arow-name">Olha Mokreieva</div><div class="arow-time">5:30 PM</div></div>
+            <div class="abadges"><span class="bdg bdg-r">● SOS activated</span><span class="bdg bdg-g">Survivor</span></div>
+            <div class="arow-actions">
+              <button class="arow-action-btn dispatch" onclick="event.stopPropagation();dispatchTeam(&#39;Olha Mokreieva&#39;)">
+                <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>Dispatch
+              </button>
+              <button class="arow-action-btn chat-btn" onclick="event.stopPropagation();openCoChat(&#39;Olha Mokreieva&#39;,&#39;OM&#39;)">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>Chat
+              </button>
+            </div>
+          </div>
+          <div class="arow" onclick="pickAlert(this,&#39;a2&#39;)">
+            <div class="arow-top"><div class="arow-name">Marco D*****</div><div class="arow-time">5:18 PM</div></div>
+            <div class="abadges"><span class="bdg bdg-r">● SOS activated</span><span class="bdg bdg-g">Survivor</span><span class="bdg bdg-g">Injured</span></div>
+            <div class="arow-actions">
+              <button class="arow-action-btn dispatch" onclick="event.stopPropagation();dispatchTeam(&#39;Marco D*****&#39;)">
+                <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>Dispatch
+              </button>
+              <button class="arow-action-btn chat-btn" onclick="event.stopPropagation();openCoChat(&#39;Marco D*****&#39;,&#39;MD&#39;)">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>Chat
+              </button>
+            </div>
+          </div>
+          <div class="arow" onclick="pickAlert(this,&#39;a3&#39;)">
+            <div class="arow-top"><div class="arow-name">Sara N****</div><div class="arow-time">5:02 PM</div></div>
+            <div class="abadges"><span class="bdg bdg-r">● SOS activated</span><span class="bdg bdg-g">Survivor</span><span class="bdg bdg-g">Kids · 2</span></div>
+            <div class="arow-actions">
+              <button class="arow-action-btn dispatch" onclick="event.stopPropagation();dispatchTeam(&#39;Sara N****&#39;)">
+                <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>Dispatch
+              </button>
+              <button class="arow-action-btn chat-btn" onclick="event.stopPropagation();openCoChat(&#39;Sara N****&#39;,&#39;SN&#39;)">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>Chat
+              </button>
+            </div>
+          </div>
+          <div class="arow" onclick="pickAlert(this,&#39;a4&#39;)">
+            <div class="arow-top"><div class="arow-name">James O*****</div><div class="arow-time">4:51 PM</div></div>
+            <div class="abadges"><span class="bdg bdg-r">● SOS activated</span><span class="bdg bdg-g">Survivor</span><span class="bdg bdg-g">In Group</span></div>
+            <div class="arow-actions">
+              <button class="arow-action-btn dispatch" onclick="event.stopPropagation();dispatchTeam(&#39;James O*****&#39;)">
+                <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></svg>Dispatch
+              </button>
+              <button class="arow-action-btn chat-btn" onclick="event.stopPropagation();openCoChat(&#39;James O*****&#39;,&#39;JO&#39;)">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>Chat
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- IN PROGRESS -->
+        <div class="agrp-hdr" onclick="toggleGrp(&#39;inprogress&#39;)">
+          <div class="agrp-lbl"><div class="agrp-dot" style="background:var(--blue)"></div>IN PROGRESS</div>
+          <div class="agrp-r"><span class="agrp-cnt" id="cnt-inprogress">0</span><span class="mchev" id="chev-inprogress">▲</span></div>
+        </div>
+        <div id="body-inprogress"><div class="empty-r">No cases in progress.</div></div>
+        <!-- CLOSED -->
+        <div class="agrp-hdr" onclick="toggleGrp(&#39;closed&#39;)">
+          <div class="agrp-lbl"><div class="agrp-dot" style="background:var(--green)"></div>CLOSED</div>
+          <div class="agrp-r"><span class="agrp-cnt" id="cnt-closed">0</span><span class="mchev" id="chev-closed">▲</span></div>
+        </div>
+        <div id="body-closed"><div class="empty-r">No closed cases yet.</div></div>
+      </div>
+      <div class="mission-panel">
+        <div class="mp-title">Mission Updates</div>
+        <p id="mission-txt">No mission updates yet. Select an alert above to view details.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><div id="toast-msg"></div></div>
+
+<script>
+const HOLD=3000, CIRC=2*Math.PI*62;
+let sosActive=false, sosTimer=null;
+let alertTotal=4, openTotal=4;
+let grpOpen={open:true, inprogress:true, closed:true};
+let missionMap={
+  a1:'Olha Mokreieva · SOS at 5:30 PM. No team assigned yet. Use Assign Team to dispatch.',
+  a2:'Marco D***** · SOS at 5:18 PM. Reported injured. Priority dispatch recommended.',
+  a3:'Sara N**** · SOS at 5:02 PM. With 2 children. Requires family-capable rescue unit.',
+  a4:'James O***** · SOS at 4:51 PM. In group of survivors. Area sweep advised.'
+};
+let currentTab='home';
+let currentUserData={name:'',phone:'',dob:'',address:'',contacts:[],bloodType:'',allergies:'',conditions:'',medications:'',notes:'',insurance:[],profileSaved:false};
+let chatMessages=[];
+
+function sosStart(e){
+  e.preventDefault();
+  if(sosActive) return;
+  const sosOuter=document.getElementById('sos-outer');
+  const sosArc=document.getElementById('sos-arc');
+  if(!sosOuter || !sosArc) return;
+  
+  sosOuter.classList.add('holding');
+  const t0=Date.now();
+  sosTimer=setInterval(()=>{
+    const pct=Math.min((Date.now()-t0)/HOLD,1);
+    if(sosArc) sosArc.style.strokeDashoffset=CIRC*(1-pct);
+    if(pct>=1){
+      clearInterval(sosTimer);
+      fireSOSAlert();
+    }
+  },20);
+}
+
+function sosStop(e){
+  if(sosActive) return;
+  clearInterval(sosTimer);
+  const sosOuter=document.getElementById('sos-outer');
+  const sosArc=document.getElementById('sos-arc');
+  if(sosOuter) sosOuter.classList.remove('holding');
+  if(sosArc) sosArc.style.strokeDashoffset=CIRC;
+}
+
+function fireSOSAlert(){
+  sosActive=true;
+  const scrNormal=document.getElementById('scr-normal');
+  const scrSent=document.getElementById('scr-sent');
+  
+  if(scrNormal) scrNormal.style.display='none';
+  if(scrSent) scrSent.style.display='flex';
+  
+  showToast('🆘 New SOS received — Coordinator console updated');
+  addNewSOS();
+}
+
+function cancelAlert(){
+  sosActive=false;
+  const scrNormal=document.getElementById('scr-normal');
+  const scrSent=document.getElementById('scr-sent');
+  const sosOuter=document.getElementById('sos-outer');
+  const sosArc=document.getElementById('sos-arc');
+  
+  if(scrNormal) scrNormal.style.display='flex';
+  if(scrSent) scrSent.style.display='none';
+  if(sosOuter) sosOuter.classList.remove('holding');
+  if(sosArc) sosArc.style.strokeDashoffset=CIRC;
+}
+
+let scOpen=true;
+function toggleStatus(){
+  scOpen=!scOpen;
+  document.getElementById('sc-body').style.display=scOpen?'':'none';
+  document.getElementById('sc-chev').textContent=scOpen?'▲':'▼';
+}
+function toggleTag(el){
+  const isCounter=el.textContent.includes('Alone')||el.textContent.includes('In Group')||el.textContent.includes('Kids')||el.textContent.includes('Pets');
+  if(isCounter){
+    el.classList.toggle('on-r');
+    if(el.classList.contains('on-r')){
+      let badge=el.querySelector('.stag-badge');
+      if(!badge){badge=document.createElement('span');badge.className='stag-badge';el.appendChild(badge);}
+      badge.style.display='block';
+      const current=parseInt(badge.textContent)||0;
+      badge.textContent=current+1;
+    }else{
+      const badge=el.querySelector('.stag-badge');
+      if(badge){const current=parseInt(badge.textContent)||0;badge.textContent=current>1?current-1:0;if(current<=1) badge.style.display='none';}
+    }
+  }else{
+    el.classList.toggle('on-r');
+  }
+}
+
+document.getElementById('img-upload-btn')?.addEventListener('click',()=>{
+  if(sosActive) document.getElementById('img-upload-input').click();
+});
+document.getElementById('img-upload-input')?.addEventListener('change',(e)=>{
+  if(e.target.files[0]) showToast('📷 Image added to status');
+});
+
+function switchTab(el,tab){
+  document.querySelectorAll('.ph-nav-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  currentTab=tab;
+  if(tab==='home') location.reload();
+  else if(tab==='map') openNearbyMap();
+  else if(tab==='chat') openChat();
+  else if(tab==='profile') openProfile();
+}
+
+function openNearbyMap(){
+  const phScreen=document.getElementById('ph-screen');
+  phScreen.innerHTML=`<div class="map-container"><canvas id="map-canvas"></canvas><div class="distance-filter"><span style="font-size:10px;color:var(--text3)">Distance:</span><button class="dist-btn active" onclick="filterDistance(this)">200m</button><button class="dist-btn" onclick="filterDistance(this)">500m</button><button class="dist-btn" onclick="filterDistance(this)">1km</button></div><button class="btn-p2p-chat" onclick="openP2PChat()" title="Chat with nearby survivors">💬 Chat with Survivors</button></div>`;
+  setTimeout(initCanvasMap,50);
+}
+
+function initCanvasMap(){
+  const canvas=document.getElementById('map-canvas');
+  if(!canvas) return;
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  const ctx=canvas.getContext('2d');
+  
+  ctx.fillStyle='#0a0d15';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  
+  ctx.strokeStyle='rgba(255,255,255,0.05)';
+  ctx.lineWidth=1;
+  for(let i=0;i<=canvas.width;i+=40){
+    ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,canvas.height);ctx.stroke();
+  }
+  for(let i=0;i<=canvas.height;i+=40){
+    ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(canvas.width,i);ctx.stroke();
+  }
+  
+  const cx=canvas.width/2,cy=canvas.height/2;
+  ctx.fillStyle='#3a7bd5';
+  ctx.beginPath();ctx.arc(cx,cy,10,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle='rgba(232,237,245,0.9)';ctx.font='9px "DM Sans"';ctx.textAlign='center';
+  ctx.fillText('📍 You',cx,cy-20);
+  
+  const survivors=[
+    {x:cx+60,y:cy-80,d:'45m'},{x:cx-90,y:cy+40,d:'62m'},{x:cx+70,y:cy+60,d:'38m'}
+  ];
+  survivors.forEach(s=>{
+    ctx.fillStyle='#2ecc8a';
+    ctx.beginPath();ctx.arc(s.x,s.y,9,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='rgba(232,237,245,0.9)';ctx.font='bold 9px "DM Sans"';ctx.textAlign='center';ctx.fillText('👤',s.x,s.y);
+    ctx.font='8px "IBM Plex Mono"';ctx.fillStyle='rgba(138,150,170,0.8)';ctx.fillText(s.d,s.x,s.y+22);
+  });
+  showToast('📍 Map loaded');
+}
+
+function filterDistance(btn){
+  document.querySelectorAll('.dist-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const dist=btn.textContent;
+  showToast(`📍 Showing survivors within ${dist}`);
+}
+
+function openP2PChat(){
+  document.getElementById('ph-screen').innerHTML=`<div class="chat-container"><div class="chat-header"><div class="chat-avatar" style="background:var(--green-dim);color:var(--green)">P2P</div><div class="chat-info"><h4>Nearby Survivors</h4><p>3 survivors connected</p></div></div><div class="messages-list" id="messages-list"></div><div class="chat-input-area"><input type="text" class="chat-input" id="chat-input" placeholder="Share info with nearby survivors..." onkeypress="if(event.key==='Enter')sendP2PMessage()"><button class="chat-btn" onclick="startVoiceMessage()" title="Voice message">🎤</button><button class="chat-send" onclick="sendP2PMessage()">→</button></div></div>`;
+  const p2pMessages=[{from:'rescuer',text:'Alex T. nearby: I have water and first aid supplies',time:'14:23'},{from:'rescuer',text:'Jordan M. nearby: Need assistance with injured family member',time:'14:24'}];
+  chatMessages=p2pMessages;
+  renderChatMessages();
+  setTimeout(()=>document.getElementById('chat-input')?.focus(),50);
+}
+
+function sendP2PMessage(){
+  const input=document.getElementById('chat-input');
+  const text=input.value.trim();
+  if(!text) return;
+  addChatMessage('us',text);
+  input.value='';
+  const responses=['Received! Thanks for sharing.','That helps - shared with group.','Noted. Stay safe!'];
+  const rnd=Math.floor(Math.random()*responses.length);
+  setTimeout(()=>addChatMessage('rescuer',responses[rnd]),600);
+}
+
+function openChat(){
+  document.getElementById('ph-screen').innerHTML=`<div class="chat-container"><div class="chat-header"><div class="chat-avatar">RS</div><div class="chat-info"><h4>Rescue Station</h4><p>Response team online</p></div></div><div class="messages-list" id="messages-list"></div><div class="chat-input-area"><input type="text" class="chat-input" id="chat-input" placeholder="Type message..." onkeypress="if(event.key==='Enter')sendMessage()"><button class="chat-btn" onclick="startVoiceMessage()" title="Voice message">🎤</button><button class="chat-send" onclick="sendMessage()">→</button></div></div>`;
+  renderChatMessages();
+  setTimeout(()=>document.getElementById('chat-input')?.focus(),50);
+}
+
+function addChatMessage(from,text){
+  const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  chatMessages.push({from,text,time});
+  if(currentTab==='chat') renderChatMessages();
+}
+
+function renderChatMessages(){
+  const list=document.getElementById('messages-list');
+  if(!list) return;
+  list.innerHTML='';
+  chatMessages.forEach(m=>{
+    const el=document.createElement('div');
+    el.className=`msg ${m.from==='us'?'us':'them'}`;
+    el.innerHTML=`<div class="msg-content">${m.text}<div class="msg-time">${m.time}</div></div>`;
+    list.appendChild(el);
+  });
+  list.scrollTop=list.scrollHeight;
+}
+
+function sendMessage(){
+  const input=document.getElementById('chat-input');
+  const text=input.value.trim();
+  if(!text) return;
+  addChatMessage('us',text);
+  input.value='';
+  setTimeout(()=>addChatMessage('rescuer','Message received. Will assist.'),800);
+}
+
+function startVoiceMessage(){
+  showToast('🎤 Voice message feature - ready to receive');
+  const input=document.getElementById('chat-input');
+  input.placeholder='Recording audio...';
+  setTimeout(()=>{
+    input.placeholder='Type message...';
+    addChatMessage('us','[Voice message received]');
+    setTimeout(()=>addChatMessage('rescuer','Voice message received. Standby.'),500);
+  },2000);
+}
+
+function openProfile(){
+  if(currentUserData.profileSaved){
+    showProfileDisplay();
+  }else{
+    showProfileEdit();
+  }
+}
+
+function showProfileEdit(){
+  document.getElementById('ph-screen').innerHTML=`<div class="profile-container">
+    <!-- Personal Information Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>📋 Personal Information</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div class="profile-field">
+          <label class="profile-label">Full Name</label>
+          <input type="text" class="edit-input" id="field-name" placeholder="Enter your full name" value="${currentUserData.name}">
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Phone</label>
+          <input type="tel" class="edit-input" id="field-phone" placeholder="Emergency contact number" value="${currentUserData.phone}">
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Date of Birth</label>
+          <input type="date" class="edit-input" id="field-dob" value="${currentUserData.dob}">
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Address</label>
+          <input type="text" class="edit-input" id="field-address" placeholder="Street address" value="${currentUserData.address}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Emergency Contacts Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)" style="justify-content:space-between">
+        <span>🚨 Emergency Contacts</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="add-btn" onclick="event.stopPropagation();addEmergencyContact()" style="width:24px;height:24px;font-size:14px" title="Add contact">+</button>
+          <span class="profile-chev">▼</span>
+        </div>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div id="contacts-list"></div>
+      </div>
+    </div>
+
+    <!-- Health Information Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>⚕️ Health Information</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div class="profile-field">
+          <label class="profile-label">Blood Type</label>
+          <input type="text" class="edit-input" id="field-blood" placeholder="e.g., O+" value="${currentUserData.bloodType}">
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Allergies</label>
+          <input type="text" class="edit-input" id="field-allergies" placeholder="e.g., Penicillin" value="${currentUserData.allergies}">
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Medical Conditions</label>
+          <input type="text" class="edit-input" id="field-conditions" placeholder="e.g., Asthma, Diabetes" value="${currentUserData.conditions}">
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Current Medications</label>
+          <input type="text" class="edit-input" id="field-meds" placeholder="e.g., Aspirin" value="${currentUserData.medications}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Insurance Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>🛡️ Insurance</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div id="insurance-list"></div>
+        <button class="add-btn" onclick="addInsurance()" style="width:100%;margin-top:8px">+ Add Insurance Policy</button>
+      </div>
+    </div>
+
+    <!-- Other Notes Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>📝 Other Notes</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div class="profile-field">
+          <label class="profile-label">Additional Information</label>
+          <textarea class="edit-input" id="field-notes" placeholder="Any other relevant information..." style="min-height:80px;resize:vertical">${currentUserData.notes}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-save-profile" onclick="saveProfile()">Save Profile</button>
+  </div>`;
+  renderContactsList();
+  renderInsuranceList();
+}
+
+function toggleProfileSection(header){
+  const body=header.nextElementSibling;
+  const chev=header.querySelector('.profile-chev');
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  chev.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
+}
+
+function showProfileDisplay(){
+  const html=`<div class="profile-container">
+    <!-- Personal Information Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>📋 Personal Information</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div class="profile-field">
+          <label class="profile-label">Full Name</label>
+          <div class="profile-value">${currentUserData.name||'—'}</div>
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Phone</label>
+          <div class="profile-value">${currentUserData.phone||'—'}</div>
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Date of Birth</label>
+          <div class="profile-value">${currentUserData.dob||'—'}</div>
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Address</label>
+          <div class="profile-value">${currentUserData.address||'—'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emergency Contacts Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)" style="justify-content:space-between">
+        <span>🚨 Emergency Contacts</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        ${currentUserData.contacts.map(c=>`<div class="profile-item"><div><div style="font-weight:600;font-size:12px">${c.name}</div><div style="font-size:10px;color:var(--text3)">${c.phone}</div></div></div>`).join('')||'<div style="color:var(--text3);font-size:11px;padding:8px">No emergency contacts added</div>'}
+      </div>
+    </div>
+
+    <!-- Health Information Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>⚕️ Health Information</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div class="profile-field">
+          <label class="profile-label">Blood Type</label>
+          <div class="profile-value">${currentUserData.bloodType||'—'}</div>
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Allergies</label>
+          <div class="profile-value">${currentUserData.allergies||'—'}</div>
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Medical Conditions</label>
+          <div class="profile-value">${currentUserData.conditions||'—'}</div>
+        </div>
+        <div class="profile-field">
+          <label class="profile-label">Current Medications</label>
+          <div class="profile-value">${currentUserData.medications||'—'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insurance Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>🛡️ Insurance</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        ${currentUserData.insurance.map(i=>`<div class="profile-item"><div><div style="font-weight:600;font-size:12px">${i.provider}</div><div style="font-size:10px;color:var(--text3)">${i.policy}</div></div></div>`).join('')||'<div style="color:var(--text3);font-size:11px;padding:8px">No insurance policies added</div>'}
+      </div>
+    </div>
+
+    <!-- Other Notes Section -->
+    <div class="profile-section">
+      <div class="profile-section-head" onclick="toggleProfileSection(this)">
+        <span>📝 Other Notes</span>
+        <span class="profile-chev">▼</span>
+      </div>
+      <div class="profile-section-body" style="display:none">
+        <div class="profile-value" style="font-size:11px;line-height:1.6">${currentUserData.notes||'No additional notes'}</div>
+      </div>
+    </div>
+
+    <button class="btn-save-profile" style="background:var(--blue)" onclick="showProfileEdit()">✎ Edit Profile</button>
+  </div>`;
+  document.getElementById('ph-screen').innerHTML=html;
+}
+
+function addEmergencyContact(){
+  const name=prompt('Contact name:');if(!name)return;
+  const phone=prompt('Contact phone:');if(!phone)return;
+  currentUserData.contacts.push({name,phone});
+  renderContactsList();
+}
+
+function addInsurance(){
+  const provider=prompt('Insurance provider:');if(!provider)return;
+  const policy=prompt('Policy number:');if(!policy)return;
+  currentUserData.insurance.push({provider,policy});
+  renderInsuranceList();
+}
+
+function renderContactsList(){
+  const list=document.getElementById('contacts-list');
+  if(!list)return;
+  list.innerHTML=currentUserData.contacts.map((c,i)=>`<div class="profile-item"><div><div style="font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--text3)">${c.phone}</div></div><button class="add-btn" style="background:var(--red)" onclick="removeContact(${i})">−</button></div>`).join('');
+}
+
+function renderInsuranceList(){
+  const list=document.getElementById('insurance-list');
+  if(!list)return;
+  list.innerHTML=currentUserData.insurance.map((p,i)=>`<div class="profile-item"><div><div style="font-weight:600">${p.provider}</div><div style="font-size:10px;color:var(--text3)">${p.policy}</div></div><button class="add-btn" style="background:var(--red)" onclick="removeInsurance(${i})">−</button></div>`).join('');
+}
+
+function removeContact(idx){currentUserData.contacts.splice(idx,1);renderContactsList();}
+function removeInsurance(idx){currentUserData.insurance.splice(idx,1);renderInsuranceList();}
+
+function saveProfile(){
+  currentUserData.name=document.getElementById('field-name').value;
+  currentUserData.phone=document.getElementById('field-phone').value;
+  currentUserData.dob=document.getElementById('field-dob').value;
+  currentUserData.address=document.getElementById('field-address').value;
+  currentUserData.bloodType=document.getElementById('field-blood').value;
+  currentUserData.allergies=document.getElementById('field-allergies').value;
+  currentUserData.conditions=document.getElementById('field-conditions').value;
+  currentUserData.medications=document.getElementById('field-meds').value;
+  currentUserData.notes=document.getElementById('field-notes').value;
+  currentUserData.profileSaved=true;
+  showToast('✓ Profile saved successfully');
+  setTimeout(()=>showProfileDisplay(),500);
+}
+
+function switchView(v){
+  const vbtn=event.target;
+  if(!vbtn) return;
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('active'));
+  vbtn.classList.add('active');
+  document.querySelectorAll('.view').forEach(view=>view.classList.remove('active'));
+  const viewEl=document.getElementById('v-'+v);
+  if(viewEl) viewEl.classList.add('active');
+  const badge=document.getElementById('top-alert-badge');
+  if(badge) badge.style.display=v==='coordinator'?'flex':'none';
+}
+
+function toggleGrp(key){
+  grpOpen[key]=!grpOpen[key];
+  const body=document.getElementById('body-'+key);
+  const chev=document.getElementById('chev-'+key);
+  if(body) body.style.display=grpOpen[key]?'':'none';
+  if(chev) chev.classList.toggle('dn',!grpOpen[key]);
+}
+
+function pickAlert(el,id){
+  const allRows=document.querySelectorAll('.arow');
+  if(allRows) allRows.forEach(r=>r.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+  const missionTxt=document.getElementById('mission-txt');
+  if(missionTxt) missionTxt.textContent=missionMap[id]||'New SOS alert. No team assigned yet. Use Assign Team to dispatch.';
+}
+
+function pickTab(el){
+  if(el.classList.contains('ai')) return;
+  document.querySelectorAll('.atab:not(.ai)').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+let seq=0;
+function addNewSOS(){
+  seq++;
+  const id='ns'+seq;
+  const name='New Survivor';
+  const initials='NS';
+  const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  alertTotal++;
+  openTotal++;
+  document.getElementById('top-badge').textContent=alertTotal+' Active Alerts';
+  document.getElementById('co-badge').textContent=alertTotal+' Active Alerts';
+  const body=document.getElementById('body-open');
+  const row=document.createElement('div');
+  row.className='arow';
+  row.innerHTML=`
+    <div class="arow-top"><div class="arow-name">${name}</div><div class="arow-time">${time}</div></div>
+    <div class="abadges"><span class="bdg bdg-r">● SOS activated</span><span class="bdg bdg-g">Survivor</span></div>
+    <div class="arow-actions">
+      <button class="arow-action-btn dispatch" onclick="event.stopPropagation();dispatchTeam('${name}')">
+        <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Dispatch
+      </button>
+      <button class="arow-action-btn chat-btn" onclick="event.stopPropagation();openCoChat('${name}','${initials}')">
+        <svg viewBox="0 0 24 24" style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat
+      </button>
+    </div>`;
+  row.onclick=()=>pickAlert(row,id);
+  body.insertBefore(row,body.firstChild);
+  document.getElementById('cnt-open').textContent=openTotal;
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+const coChatLogs={};
+
+function dispatchTeam(name){
+  showToast(`⚡ Team dispatched to ${name}`);
+  const missionTxt=document.getElementById('mission-txt');
+  if(missionTxt) missionTxt.textContent=`${name} · Rescue team dispatched. ETA 12 minutes. Team en route.`;
+
+  // Push message into survivor chat
+  addChatMessage('rescuer','⚡ A rescue team has been dispatched to your location. ETA: 12 minutes. Stay where you are and keep your phone on.');
+
+  // Also update the rescue-status block if SOS sent screen is visible
+  const rescueStatus=document.getElementById('rescue-status');
+  if(rescueStatus) rescueStatus.innerHTML='<span style="color:var(--green)">⚡ Rescue team dispatched — ETA <strong>12 minutes</strong>. Stay visible and keep your phone on.</span>';
+}
+
+function openCoChat(name, initials){
+  const panel=document.getElementById('co-chat-panel');
+  const av=document.getElementById('co-chat-av');
+  const nameEl=document.getElementById('co-chat-name');
+  const msgsEl=document.getElementById('co-chat-msgs');
+  if(!panel||!av||!nameEl||!msgsEl) return;
+
+  av.textContent=initials;
+  nameEl.textContent=name;
+  panel.classList.add('open');
+
+  // Seed chat log if first time
+  if(!coChatLogs[name]){
+    coChatLogs[name]=[
+      {from:'them', text:'🆘 SOS activated. Please help.', time: 'now'}
+    ];
+  }
+
+  renderCoChat(name);
+  setTimeout(()=>document.getElementById('co-chat-input')?.focus(),50);
+}
+
+function closeCoChat(){
+  const panel=document.getElementById('co-chat-panel');
+  if(panel) panel.classList.remove('open');
+}
+
+function renderCoChat(name){
+  const msgsEl=document.getElementById('co-chat-msgs');
+  if(!msgsEl) return;
+  const logs=coChatLogs[name]||[];
+  msgsEl.innerHTML=logs.map(m=>`
+    <div class="co-msg ${m.from==='us'?'us':'them'}">
+      <div class="co-msg-bubble">${m.text}</div>
+      <div class="co-msg-time">${m.time}</div>
+    </div>
+  `).join('');
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+}
+
+function sendCoMsg(){
+  const input=document.getElementById('co-chat-input');
+  const nameEl=document.getElementById('co-chat-name');
+  if(!input||!nameEl) return;
+  const text=input.value.trim();
+  const name=nameEl.textContent;
+  if(!text||!name) return;
+  const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  if(!coChatLogs[name]) coChatLogs[name]=[];
+  coChatLogs[name].push({from:'us', text, time});
+  input.value='';
+  renderCoChat(name);
+  setTimeout(()=>{
+    const replies=['Understood. Staying put.','How long until help arrives?','Thank you, I can hear sirens.','Please hurry, condition worsening.'];
+    coChatLogs[name].push({from:'them', text:replies[Math.floor(Math.random()*replies.length)], time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+    renderCoChat(name);
+  },1000);
+}
+
+window.addEventListener('load',()=>{
+  const sosArcEl=document.getElementById('sos-arc');
+  if(sosArcEl){
+    sosArcEl.style.strokeDasharray=CIRC;
+    sosArcEl.style.strokeDashoffset=CIRC;
+  }
+  chatMessages.push({from:'rescuer',text:'📞 Use this chat to communicate with rescue teams. Type your needs or confirm your location.',time:'Ready'});
+});
+</script>
+
+<div id="demo-banner">
+  <div class="demo-inner">
+    <div class="demo-icon">⚠️</div>
+    <div class="demo-text">
+      <h5>This is a prototype demo — not a live emergency service</h5>
+      <p>GroundSOS is currently in development. In a real emergency, call your local emergency number immediately. Learn more at <a href="https://groundsos.com/" target="_blank">groundsos.com</a> · <a href="mailto:hello.groundsos@gmail.com">hello.groundsos@gmail.com</a></p>
+    </div>
+  </div>
+  <button class="demo-dismiss" onclick="document.getElementById(&#39;demo-banner&#39;).style.display=&#39;none&#39;">Got it</button>
+</div>
+
+
+
+</body></html>
